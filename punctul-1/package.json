@@ -1,0 +1,30 @@
+{
+  "name": "punctul-1",
+  "version": "1.0.0",
+  "description": "Rezolvarea la punctul 1 al temei 3 ICLP",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EINazare/tema-3-iclp.git"
+  },
+  "keywords": [
+    "nodejs",
+    "js",
+    "javascript",
+    "learning",
+    "homework"
+  ],
+  "author": "EINazare",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/EINazare/tema-3-iclp/issues"
+  },
+  "homepage": "https://github.com/EINazare/tema-3-iclp#readme",
+  "dependencies": {
+    "yargs": "15.3.1"
+  }
+}
