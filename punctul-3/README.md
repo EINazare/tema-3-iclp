@@ -1,6 +1,6 @@
 # Cerinta
 ```
-2. Aveti grija sa nu crawlati de 2 ori acelasi url.
+3. Nu trebuie sa descarcati o pagina in intregime pentru a cauta url-uri in ea. Cautati url-uri in paginile descarcate pe masura ce le trageti. Nu mentineti toata pagina in memorie, in realitate orice url are maxim 2000 de caractere, deci va trebuie maxim 2000 de bytes per pagina tinuti minte.
 ```
 
 # Comenzi
