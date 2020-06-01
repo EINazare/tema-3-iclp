@@ -103,11 +103,11 @@ const crawler = async () => {
         allUrls.forEach((allItem, i) => {
           let exists = false;
           newUrls.forEach((newItem, i) => {
-            if(allItem.url === newItem.url){
+            if (allItem.url === newItem.url) {
               exists = true;
             }
           });
-          if(!exists){
+          if (!exists) {
             newUrls.push(allItem);
           }
         });
