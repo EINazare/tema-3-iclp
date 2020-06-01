@@ -1,6 +1,6 @@
 # Cerinta
 ```
-2. Aveti grija sa nu crawlati de 2 ori acelasi url.
+4. Daca vreo pagina nu se incarca (din orice motiv) reincercati-o. Nu reincercati o pagina de mai mult de X ori. Faceti asta si daca ati reusit sa descarcati deja cateva bucati din pagina si ati intampinat o problema dupa.
 ```
 
 # Comenzi
