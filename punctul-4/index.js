@@ -5,7 +5,7 @@ const colors = require("colors");
 // for getting the arguments passed to the start script
 const yargs = require("yargs").argv;
 // regex for validating urls
-const urlValidator = /http[s]?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
+const urlValidator = /http[s]?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
 // function for checking if an url is valid or not
 // attention, it only works for http and https urls
 const isUrl = url => {
@@ -52,60 +52,83 @@ const crawler = async () => {
     let nextUrls = allUrls.filter(item => !item.parsed);
     while (nextUrls.length !== 0) {
       try {
-        if(nextUrls[0].noOfTries < x){
-          // mark the first un-crawled/un-marked url as crawled/marked
-          allUrls = allUrls.map(item => {
-            if (item.url === nextUrls[0].url) {
-              return {
-                noOfTries: nextUrls[0].noOfTries + 1,
-                parsed: true,
-                url: item.url
-              };
-            } else {
-              return item;
+        // mark the first un-crawled/un-marked url as crawled/marked
+        allUrls = allUrls.map(item => {
+          if (item.url === nextUrls[0].url) {
+            return {
+              noOfTries: item.noOfTries + 1,
+              parsed: true,
+              url: item.url
+            };
+          } else {
+            return item;
+          }
+        });
+        let content = "";
+        // get the contents given by the first un-crawled/un-marked
+        // which now was set as marked
+        const page = await new Promise((resolve, reject) => {
+          request({ uri: nextUrls[0].url })
+            .on("data", chunk => {
+              content = content + chunk;
+              // get all urls found on the contents
+              // and add them to the list of all urls
+              allUrls = allUrls
+                .concat(
+                  // get all urls found on the contents
+                  getUrls(content).map(item => {
+                    allUrls.forEach(itemAllUrls => {
+                      if (itemAllUrls.url === item) {
+                        return null;
+                      }
+                    });
+                    return {
+                      noOfTries: 0,
+                      parsed: false,
+                      url: item
+                    };
+                  })
+                )
+                .filter(item => item !== null);
+              if (content.length >= 2000) {
+                content = "";
+              }
+            })
+            .on("end", () => {
+              resolve();
+            });
+        });
+        // check if there are no duplicates in the allUrls array, if so, delete them
+        let newUrls = [];
+        allUrls.forEach((allItem, i) => {
+          let exists = false;
+          newUrls.forEach((newItem, i) => {
+            if(allItem.url === newItem.url){
+              exists = true;
             }
           });
-          let content = "";
-          // get the contents given by the first un-crawled/un-marked
-          // which now was set as marked
-          const page = await new Promise((resolve, reject) => {
-            request({ uri: nextUrls[0].url })
-              .on("data", chunk => {
-                content = content + chunk;
-                if (content.length >= 2000) {
-                  // get all urls found on the contents
-                  // and add them to the list of all urls
-                  allUrls = allUrls
-                    .concat(
-                      // get all urls found on the contents
-                      getUrls(content).map(item => {
-                        allUrls.forEach(itemAllUrls => {
-                          if (itemAllUrls.url === item) {
-                            return null;
-                          }
-                        });
-                        return {
-                          noOfTries: 0,
-                          parsed: false,
-                          url: item
-                        };
-                      })
-                    )
-                    .filter(item => item !== null);
-                    console.log("\n\n\n========================\n\n\n");
-                    console.log(content);
-                    console.log("\n\n\n========================\n\n\n");
-                  content = "";
-                }
-              })
-              .on("end", () => {
-                resolve();
-              });
-          });
-        }
+          if(!exists){
+            newUrls.push(allItem);
+          }
+        });
+        allUrls = newUrls;
         // get all un-crawled/un-marked urls
         nextUrls = allUrls.filter(item => !item.parsed && item.noOfTries < x);
       } catch (error) {
+        // un-mark the marked url, so that it may start again the crawler for it
+        allUrls = allUrls.map(item => {
+          if (item.url === nextUrls[0].url) {
+            return {
+              noOfTries: item.noOfTries,
+              parsed: false,
+              url: item.url
+            };
+          } else {
+            return item;
+          }
+        });
+        // get all un-crawled/un-marked urls
+        nextUrls = allUrls.filter(item => !item.parsed && item.noOfTries < x);
         // if there is an error in the Promise, log it
         console.error("ERROR:".red);
         console.error(error.yellow);
