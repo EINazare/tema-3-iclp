@@ -65,20 +65,22 @@ const crawler = async () => {
         const page = await downloadPage(nextUrls[0].url);
         // get all urls found on the contents
         // and add them to the list of all urls
-        allUrls = allUrls.concat(
-          // get all urls found on the contents
-          getUrls(page).map(item => {
-            allUrls.forEach(itemAllUrls => {
-              if (itemAllUrls.url === item) {
-                return null;
-              }
-            });
-            return {
-              parsed: false,
-              url: item
-            };
-          })
-        ).filter(item => item !== null);
+        allUrls = allUrls
+          .concat(
+            // get all urls found on the contents
+            getUrls(page).map(item => {
+              allUrls.forEach(itemAllUrls => {
+                if (itemAllUrls.url === item) {
+                  return null;
+                }
+              });
+              return {
+                parsed: false,
+                url: item
+              };
+            })
+          )
+          .filter(item => item !== null);
         // get all un-crawled/un-marked urls
         nextUrls = allUrls.filter(item => !item.parsed);
       } catch (error) {
