@@ -67,25 +67,25 @@ const crawler = async () => {
           request({ uri: nextUrls[0].url })
             .on("data", chunk => {
               content = content + chunk;
+              // get all urls found on the contents
+              // and add them to the list of all urls
+              allUrls = allUrls
+                .concat(
+                  // get all urls found on the contents
+                  getUrls(content).map(item => {
+                    allUrls.forEach(itemAllUrls => {
+                      if (itemAllUrls.url === item) {
+                        return null;
+                      }
+                    });
+                    return {
+                      parsed: false,
+                      url: item
+                    };
+                  })
+                )
+                .filter(item => item !== null);
               if (content.length >= 2000) {
-                // get all urls found on the contents
-                // and add them to the list of all urls
-                allUrls = allUrls
-                  .concat(
-                    // get all urls found on the contents
-                    getUrls(content).map(item => {
-                      allUrls.forEach(itemAllUrls => {
-                        if (itemAllUrls.url === item) {
-                          return null;
-                        }
-                      });
-                      return {
-                        parsed: false,
-                        url: item
-                      };
-                    })
-                  )
-                  .filter(item => item !== null);
                 content = "";
               }
             })
@@ -93,6 +93,20 @@ const crawler = async () => {
               resolve();
             });
         });
+        // check if there are no duplicates in the allUrls array, if so, delete them
+        let newUrls = [];
+        allUrls.forEach((allItem, i) => {
+          let exists = false;
+          newUrls.forEach((newItem, i) => {
+            if(allItem.url === newItem.url){
+              exists = true;
+            }
+          });
+          if(!exists){
+            newUrls.push(allItem);
+          }
+        });
+        allUrls = newUrls;
         // get all un-crawled/un-marked urls
         nextUrls = allUrls.filter(item => !item.parsed);
       } catch (error) {
